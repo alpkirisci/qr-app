@@ -3,7 +3,7 @@
 client_id = "9e0df8cd128dd2aa71dbd5871fdf90d4"
 name = "qr-app"
 handle = "qr-app-125"
-application_url = "https://angle-abandoned-belly-greek.trycloudflare.com"
+application_url = "https://blessed-built-screen-demographic.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://angle-abandoned-belly-greek.trycloudflare.com/auth/callback",
-  "https://angle-abandoned-belly-greek.trycloudflare.com/auth/shopify/callback",
-  "https://angle-abandoned-belly-greek.trycloudflare.com/api/auth/callback"
+  "https://blessed-built-screen-demographic.trycloudflare.com/auth/callback",
+  "https://blessed-built-screen-demographic.trycloudflare.com/auth/shopify/callback",
+  "https://blessed-built-screen-demographic.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
