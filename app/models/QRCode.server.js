@@ -20,7 +20,7 @@ export async function getQRCodes(shop, graphql) {
     if (qrCodes.length === 0) return [];
 
     return Promise.all(
-        qrCodes.map((qrCode) => (supplementQRCode(qrcode, graphql)))
+        qrCodes.map((qrCode) => (supplementQRCode(qrCode, graphql)))
     );
     
 }
@@ -30,52 +30,64 @@ export function getQRCodeImage(id){
     return qrcode.toDataURL(url.href);
 }
 
-export function getDestinationUrl(qrCode){
-    if (qrCode.destination === "product"){;
-        return `https://${qrCode.shop}/products/${qrCode.productHandle}`;
-    }
+export function getDestinationUrl(qrCode) {
+  if (qrCode.destination === "product") {
+    return `https://${qrCode.shop}/products/${qrCode.productHandle}`;
+  }
 
-    const match = /gid:\/\/shopify\/ProductVariant\/([0-9]+)/.exec(qrCode.productVariantId);
-    invariant(match, "Unrecognized product variant ID");
+  const match = /gid:\/\/shopify\/ProductVariant\/([0-9]+)/.exec(qrCode.productVariantId);
+  invariant(match, "Unrecognized product variant ID");
 
-    return `https://${qrCode.shop}/cart/${match[1]}:1`;
+  return `https://${qrCode.shop}/cart/${match[1]}:1`;
 }
 
-async function supplementQRCode(qrCode, graphql){
+async function supplementQRCode(qrCode, graphql) {
+    console.log("QR Code Object:", qrCode);
+  
+    const productId = qrCode.productId;
+    console.log("Product ID:", productId);
+  
+    if (!productId) {
+      throw new Error("Invalid product ID format: undefined");
+    }
+  
     const qrCodeImagePromise = getQRCodeImage(qrCode.id);
-
+  
     const response = await graphql(
-        `
-        query supplementQRCode($id: ID!) {
-            product(id: $id) {
-                title
-                images(first:1) {
-                    nodes {
-                        altText
-                        url
-                    }
-                }
+      `
+      query supplementQRCode($id: ID!) {
+        product(id: $id) {
+          title
+          images(first: 1) {
+            nodes {
+              altText
+              url
             }
+          }
         }
-        `,{
-        variables:{
-            id:qrCode.productId,
-            }
+      }
+      `,
+      {
+        variables: {
+          id: productId,
         }
+      }
     );
-    
-    const { data: {product} } = await response.json();
-
+  
+    const { data: { product } } = await response.json();
+  
     return {
-        ...qrCode,
-        productDeleted: !product?.title,
-        productTitle: product?.title,
-        productImage: product?.images?.nodes[0]?.url,
-        productAlt: product?.images?.nodes[0]?.altText,
-        destinationUrl: getDestinationUrl(qrCode),
-        image: await qrCodeImagePromise
-    }
-}
+      ...qrCode,
+      productDeleted: !product?.title,
+      productTitle: product?.title,
+      productImage: product?.images?.nodes[0]?.url,
+      productAlt: product?.images?.nodes[0]?.altText,
+      destinationUrl: getDestinationUrl(qrCode),
+      image: await qrCodeImagePromise
+    };
+  }
+  
+
 
 export function validateQRCode(data) {
     const errors = {};
